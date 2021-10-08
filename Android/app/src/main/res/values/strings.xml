@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Musication</string>
+    <string name="paused">Paused</string>
+    <string name="music_details">Music details</string>
+    <string name="play_button">Play button</string>
+    <string name="back_button">Back button</string>
+    <string name="next_button">Next Button</string>
+</resources>
