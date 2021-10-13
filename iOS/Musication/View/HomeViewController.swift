@@ -30,7 +30,7 @@ class HomeViewController: UIViewController {
     
     let manager = CLLocationManager()
     var presenter: HomePresenter? = nil
-    var trackState: Bool = false
+    var isPlaying: Bool = false
     var state: String = "Paused" {
         willSet {
             playerState.text = newValue
@@ -53,7 +53,7 @@ class HomeViewController: UIViewController {
         manager.requestAlwaysAuthorization()
         
         if CLLocationManager.locationServicesEnabled() {
-            sendPositionRegularly()
+//            sendPositionRegularly()
             manager.startUpdatingLocation()
         }
     }
@@ -61,9 +61,9 @@ class HomeViewController: UIViewController {
     // MARK: - Action Methods
 
     @IBAction func didTapOnPlayPauseButton(_ sender: Any) {
-        trackState = !trackState
+        isPlaying = !isPlaying
         
-        if trackState {
+        if isPlaying {
             playSong()
         } else {
             pauseSong()
@@ -132,17 +132,17 @@ class HomeViewController: UIViewController {
         }
     }
     
-    private func sendPositionRegularly() {
-        _ = Timer.scheduledTimer(timeInterval: 30.0, target: self, selector: #selector(fire(timer:)), userInfo: nil, repeats: true)
-    }
-    
-    @objc func fire(timer: Timer) {
-        if CLLocationManager.locationServicesEnabled() && (manager.authorizationStatus == .authorizedAlways || manager.authorizationStatus == .authorizedWhenInUse) {
-            DispatchQueue.main.async {
-                self.presenter?.sendLocation()
-            }
-        }
-    }
+//    private func sendPositionRegularly() {
+//        _ = Timer.scheduledTimer(timeInterval: 30.0, target: self, selector: #selector(fire(timer:)), userInfo: nil, repeats: true)
+//    }
+//
+//    @objc func fire(timer: Timer) {
+//        if CLLocationManager.locationServicesEnabled() && (manager.authorizationStatus == .authorizedAlways || manager.authorizationStatus == .authorizedWhenInUse) {
+//            DispatchQueue.main.async {
+//                self.presenter?.sendLocation()
+//            }
+//        }
+//    }
     
     // MARK: - Deinit Methods
     

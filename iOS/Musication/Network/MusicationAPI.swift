@@ -8,8 +8,8 @@
 import Foundation
 
 enum MusicationAPI {
-    case nextSong
-    case sendLocation(latitude: String, longitude: String)
+    case nextSong(latitude: String, longitude: String)
+//    case sendLocation
 }
 
 extension MusicationAPI: ServiceProtocol {
@@ -25,29 +25,29 @@ extension MusicationAPI: ServiceProtocol {
         switch self {
         case .nextSong:
             return "/musication/song"
-        case .sendLocation:
-            return "/musication/location"
+//        case .sendLocation:
+//            return "/musication/location"
         }
     }
     
     var method: HttpMethod {
         switch self {
         case .nextSong:
-            return .get
-        case .sendLocation:
             return .post
+//        case .sendLocation:
+//            return .post
         }
     }
     
     var task: HttpTask {
         switch self {
-        case .nextSong:
-            let param: Parameters = [
-                "user-id": "\(UserSession.shared.getUserId())"
-            ]
-            
-            return .requestUrlParameters(urlParameters: param)
-        case .sendLocation(let latitude, let longitude):
+//        case .nextSong:
+//            let param: Parameters = [
+//                "user-id": "\(UserSession.shared.getUserId())"
+//            ]
+//
+//            return .requestUrlParameters(urlParameters: param)
+        case .nextSong(let latitude, let longitude):
             let params: Parameters = [
                 "user-id": "\(UserSession.shared.getUserId())",
                 "latitude": "\(latitude)",

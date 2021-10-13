@@ -5,4 +5,6 @@
     <string name="play_button">Play button</string>
     <string name="back_button">Back button</string>
     <string name="next_button">Next Button</string>
+    <string name="pausedString">Paused</string>
+    <string name="playingString">Playing</string>
 </resources>
