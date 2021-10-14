@@ -28,19 +28,6 @@ final class HomePresenter {
         }
     }
     
-//    func sendLocation() {
-//        service.postLocation(latitude: self.latitude, longitude: self.longitude) { [weak self] (result) in
-//            guard let self = self else { return }
-//
-//            switch result {
-//            case .success():
-//                break
-//            case .failure(let error):
-//                self.delegate?.handleError(self, error: error)
-//            }
-//        }
-//    }
-    
     func updateCurrentLocation(latitude: Double, longitude: Double) {
         self.latitude = "\(latitude)"
         self.longitude = "\(longitude)"

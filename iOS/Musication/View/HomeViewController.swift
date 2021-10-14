@@ -10,7 +10,7 @@ import AVFoundation
 import AVKit
 import CoreLocation
 
-public var audioPlayer = AVPlayer()
+public var audioPlayer = AVAudioPlayer()
 
 enum PlayingState { case playing, notPlaying }
 
@@ -53,7 +53,6 @@ class HomeViewController: UIViewController {
         manager.requestAlwaysAuthorization()
         
         if CLLocationManager.locationServicesEnabled() {
-//            sendPositionRegularly()
             manager.startUpdatingLocation()
         }
     }
@@ -132,18 +131,6 @@ class HomeViewController: UIViewController {
         }
     }
     
-//    private func sendPositionRegularly() {
-//        _ = Timer.scheduledTimer(timeInterval: 30.0, target: self, selector: #selector(fire(timer:)), userInfo: nil, repeats: true)
-//    }
-//
-//    @objc func fire(timer: Timer) {
-//        if CLLocationManager.locationServicesEnabled() && (manager.authorizationStatus == .authorizedAlways || manager.authorizationStatus == .authorizedWhenInUse) {
-//            DispatchQueue.main.async {
-//                self.presenter?.sendLocation()
-//            }
-//        }
-//    }
-    
     // MARK: - Deinit Methods
     
     deinit {
@@ -154,12 +141,22 @@ class HomeViewController: UIViewController {
 extension HomeViewController: PlayerDelegate {
     func playSong(_ presenter: HomePresenter, model: MusicModel) {
         let urlTrack = model.urlTrack
-        guard let url = NSURL(string: urlTrack) else { return }
         
-        state = "Playing"
-        playerImageView.image = #imageLiteral(resourceName: "pause_icon")
-        audioPlayer = AVPlayer(url: url as URL)
-        audioPlayer.play()
+        do {
+            state = "Playing"
+            playerImageView.image = #imageLiteral(resourceName: "pause_icon")
+            guard let url = URL(string: urlTrack) else { return }
+            
+            let data = try Data(contentsOf: url)
+            audioPlayer = try AVAudioPlayer(data: data)
+            
+            audioPlayer.delegate = self
+            audioPlayer.prepareToPlay()
+            audioPlayer.play()
+        } catch let error as NSError {
+            print("error: \(error.localizedDescription)")
+        }
+            
     }
     
     func stopSong(_ presenter: HomePresenter) {
@@ -177,5 +174,12 @@ extension HomeViewController: CLLocationManagerDelegate {
         if let location = locations.first {
             presenter?.updateCurrentLocation(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
         }
+    }
+}
+
+extension HomeViewController: AVAudioPlayerDelegate {
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        print("Play next")
+        playSong()
     }
 }

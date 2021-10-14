@@ -25,19 +25,4 @@ final class MusicationService {
             completion(.failure(error))
         }
     }
-    
-//    func postLocation(latitude: String, longitude: String, completion: @escaping (Result<Void, Error>)->Void)->Void {
-//        do {
-//            try provider.execute(model: NoReply.self, endpoint: MusicationAPI.sendLocation(latitude: latitude, longitude: longitude), completion: { (result) in
-//                switch result {
-//                case .success:
-//                    completion(.success(()))
-//                case .failure(let error):
-//                    completion(.failure(error))
-//                }
-//            })
-//        } catch {
-//            completion(.failure(error))
-//        }
-//    }
 }

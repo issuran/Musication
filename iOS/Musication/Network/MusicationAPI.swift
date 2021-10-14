@@ -25,8 +25,6 @@ extension MusicationAPI: ServiceProtocol {
         switch self {
         case .nextSong:
             return "/musication/song"
-//        case .sendLocation:
-//            return "/musication/location"
         }
     }
     
@@ -34,28 +32,18 @@ extension MusicationAPI: ServiceProtocol {
         switch self {
         case .nextSong:
             return .post
-//        case .sendLocation:
-//            return .post
         }
     }
     
     var task: HttpTask {
         switch self {
-//        case .nextSong:
-//            let param: Parameters = [
-//                "user-id": "\(UserSession.shared.getUserId())"
-//            ]
-//
-//            return .requestUrlParameters(urlParameters: param)
         case .nextSong(let latitude, let longitude):
             let params: Parameters = [
-                "user-id": "\(UserSession.shared.getUserId())",
+                "userId": "\(UserSession.shared.getUserId())",
                 "latitude": "\(latitude)",
                 "longitude": "\(longitude)"
             ]
             return .requestBodyParameters(bodyParameters: params)
         }
     }
-    
-    
 }
