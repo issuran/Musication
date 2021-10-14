@@ -60,9 +60,7 @@ class HomeViewController: UIViewController {
     // MARK: - Action Methods
 
     @IBAction func didTapOnPlayPauseButton(_ sender: Any) {
-        isPlaying = !isPlaying
-        
-        if isPlaying {
+        if !isPlaying {
             playSong()
         } else {
             pauseSong()
@@ -140,6 +138,8 @@ class HomeViewController: UIViewController {
 
 extension HomeViewController: PlayerDelegate {
     func playSong(_ presenter: HomePresenter, model: MusicModel) {
+        isPlaying = !isPlaying
+        
         let urlTrack = model.urlTrack
         
         do {
@@ -160,6 +160,7 @@ extension HomeViewController: PlayerDelegate {
     }
     
     func stopSong(_ presenter: HomePresenter) {
+        isPlaying = false
         pauseSong()
     }
     

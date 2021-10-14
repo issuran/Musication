@@ -1,5 +1,7 @@
 package com.example.musication
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +9,9 @@ import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import java.io.IOException
 
 interface PlayerDelegate {
@@ -17,12 +22,13 @@ interface PlayerDelegate {
 
 class MainActivity : AppCompatActivity(), PlayerDelegate {
 
-    private var trackState: TextView = findViewById(R.id.playState)
-    private var playButton: ImageButton = findViewById(R.id.playPauseButton)
+    private lateinit var trackState: TextView
+    private lateinit var playButton: ImageButton
 //    private var backButton: ImageButton = findViewById(R.id.backButton)
-    private var nextButton: ImageButton = findViewById(R.id.nextButton)
+    private lateinit var nextButton: ImageButton
 
-    private val audioPath = "https://65381g.ha.azioncdn.net/e/c/b/3/vaqueirosmoficial-hoje-tem-feat-rai-saia-rodada-785260ab.mp3"
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val audioPath = "https://65381g.ha.azioncdn.net/c/4/e/6/lisandro-eithne-ni-bhronin-dedicada-enya.mp3"
     private var mediaPlayer = MediaPlayer()
     private var isPlaying = false
     private var presenter: MainPresenter? = null
@@ -30,6 +36,7 @@ class MainActivity : AppCompatActivity(), PlayerDelegate {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         configurePresenter()
         setupView()
@@ -41,10 +48,13 @@ class MainActivity : AppCompatActivity(), PlayerDelegate {
     }
 
     private fun setupView() {
-        playButton.setOnClickListener {
-            isPlaying = !isPlaying
+        trackState = findViewById(R.id.playState)
+        playButton = findViewById(R.id.playPauseButton)
+//    private var backButton: ImageButton = findViewById(R.id.backButton)
+        nextButton = findViewById(R.id.nextButton)
 
-            if (isPlaying) {
+        playButton.setOnClickListener {
+            if (!isPlaying) {
                 startSong()
             } else {
                 pauseSong()
@@ -57,6 +67,7 @@ class MainActivity : AppCompatActivity(), PlayerDelegate {
     }
 
     private fun startSong() {
+        getLastKnownLocation()
         isPlaying = true
         presenter?.requestNextSong(this)
     }
@@ -78,7 +89,28 @@ class MainActivity : AppCompatActivity(), PlayerDelegate {
         startSong()
     }
 
+    fun getLastKnownLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                presenter?.updateCurrentLocation(location.latitude, location.longitude)
+            }
+        }
+    }
+
     override fun playSong(model: MusicModel) {
+        isPlaying = !isPlaying
+
         trackState.text = getString(R.string.playingString)
         playButton.setImageResource(R.drawable.pause_button)
         mediaPlayer = MediaPlayer().apply {
@@ -92,6 +124,10 @@ class MainActivity : AppCompatActivity(), PlayerDelegate {
             setDataSource(audioPath)
             prepare()
             start()
+        }
+
+        mediaPlayer.setOnCompletionListener {
+            startSong()
         }
     }
 

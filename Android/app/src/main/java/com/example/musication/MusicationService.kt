@@ -18,7 +18,7 @@ class MusicationService {
 
     fun requestNextSong(context: Context, latitude: String, longitude: String, volleyResponseListener: VolleyResponseListener) {
         val queue = Volley.newRequestQueue(context)
-        val url = "https://stark-shelf-44081.herokuapp.com/musication/song"
+        val url = "https://stark-shelf-44081.herokuapp.com/musication/songLocation"
 
         val postData = JSONObject()
         try {
