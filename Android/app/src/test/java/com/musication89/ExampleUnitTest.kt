@@ -1,4 +1,4 @@
-package com.example.musication
+package com.musication89
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.example.musication
+package com.musication89
 
 class MusicModel {
     var musicArtist: String = ""
