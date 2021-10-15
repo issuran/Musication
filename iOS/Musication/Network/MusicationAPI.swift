@@ -24,7 +24,7 @@ extension MusicationAPI: ServiceProtocol {
     var path: String {
         switch self {
         case .nextSong:
-            return "/musication/song"
+            return "/musication/songLocation"
         }
     }
     

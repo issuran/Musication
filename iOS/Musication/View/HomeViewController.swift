@@ -138,23 +138,26 @@ class HomeViewController: UIViewController {
 
 extension HomeViewController: PlayerDelegate {
     func playSong(_ presenter: HomePresenter, model: MusicModel) {
-        isPlaying = !isPlaying
-        
-        let urlTrack = model.urlTrack
-        
-        do {
-            state = "Playing"
-            playerImageView.image = #imageLiteral(resourceName: "pause_icon")
-            guard let url = URL(string: urlTrack) else { return }
+        DispatchQueue.main.async {
+            self.isPlaying = !self.isPlaying
             
-            let data = try Data(contentsOf: url)
-            audioPlayer = try AVAudioPlayer(data: data)
+            let urlTrack = model.urlTrack
             
-            audioPlayer.delegate = self
-            audioPlayer.prepareToPlay()
-            audioPlayer.play()
-        } catch let error as NSError {
-            print("error: \(error.localizedDescription)")
+            do {
+                self.state = "Playing"
+                self.playerImageView.image = #imageLiteral(resourceName: "pause_icon")
+                guard let url = URL(string: urlTrack) else { return }
+                
+                let data = try Data(contentsOf: url)
+                audioPlayer = try AVAudioPlayer(data: data)
+                
+                audioPlayer.delegate = self
+                audioPlayer.prepareToPlay()
+                audioPlayer.play()
+                
+            } catch let error as NSError {
+                print("error: \(error.localizedDescription)")
+            }
         }
             
     }

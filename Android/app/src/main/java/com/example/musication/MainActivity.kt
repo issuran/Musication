@@ -23,14 +23,15 @@ interface PlayerDelegate {
 class MainActivity : AppCompatActivity(), PlayerDelegate {
 
     private lateinit var trackState: TextView
+    private lateinit var trackDetails: TextView
     private lateinit var playButton: ImageButton
 //    private var backButton: ImageButton = findViewById(R.id.backButton)
     private lateinit var nextButton: ImageButton
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val audioPath = "https://65381g.ha.azioncdn.net/c/4/e/6/lisandro-eithne-ni-bhronin-dedicada-enya.mp3"
     private var mediaPlayer = MediaPlayer()
     private var isPlaying = false
+    private var tapped = false
     private var presenter: MainPresenter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +50,7 @@ class MainActivity : AppCompatActivity(), PlayerDelegate {
 
     private fun setupView() {
         trackState = findViewById(R.id.playState)
+        trackDetails = findViewById(R.id.musicDetails)
         playButton = findViewById(R.id.playPauseButton)
 //    private var backButton: ImageButton = findViewById(R.id.backButton)
         nextButton = findViewById(R.id.nextButton)
@@ -62,34 +64,40 @@ class MainActivity : AppCompatActivity(), PlayerDelegate {
         }
 
         nextButton.setOnClickListener {
-            nextSong()
+            if (!isPlaying) {
+                nextSong()
+            } else {
+                pauseSong()
+            }
         }
     }
 
     private fun startSong() {
-        getLastKnownLocation()
-        isPlaying = true
-        presenter?.requestNextSong(this)
+        if (!tapped && !isPlaying) {
+            tapped = true
+            getLastKnownLocation()
+            presenter?.requestNextSong(this)
+        }
     }
 
     private fun pauseSong() {
+        trackDetails.text = ""
         isPlaying = false
         trackState.text = getString(R.string.pausedString)
         playButton.setImageResource(R.drawable.play)
         try {
-            mediaPlayer.stop()
-            mediaPlayer.reset()
-            mediaPlayer.release()
+            mediaPlayer.pause()
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
 
     private fun nextSong() {
+        pauseSong()
         startSong()
     }
 
-    fun getLastKnownLocation() {
+    private fun getLastKnownLocation() {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -109,7 +117,8 @@ class MainActivity : AppCompatActivity(), PlayerDelegate {
     }
 
     override fun playSong(model: MusicModel) {
-        isPlaying = !isPlaying
+        isPlaying = true
+        tapped = false
 
         trackState.text = getString(R.string.playingString)
         playButton.setImageResource(R.drawable.pause_button)
@@ -121,7 +130,9 @@ class MainActivity : AppCompatActivity(), PlayerDelegate {
                     .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build()
             )
-            setDataSource(audioPath)
+            val url = model.urlTrack
+            trackDetails.text = model.musicArtist + " - " + model.musicName
+            setDataSource(url)
             prepare()
             start()
         }
