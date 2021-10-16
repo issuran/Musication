@@ -31,6 +31,7 @@ class HomeViewController: UIViewController {
     let manager = CLLocationManager()
     var presenter: HomePresenter? = nil
     var isPlaying: Bool = false
+    var tapped: Bool = false
     var state: String = "Paused" {
         willSet {
             playerState.text = newValue
@@ -87,20 +88,31 @@ class HomeViewController: UIViewController {
     }
     
     private func playSong() {
-        guard let presenter = presenter else { return }
-        DispatchQueue.main.async {
-            presenter.requestNextSong()
+        if !tapped && !isPlaying {
+            tapped = true
+            guard let presenter = presenter else { return }
+            DispatchQueue.main.async {
+                presenter.requestNextSong()
+            }
         }
     }
     
     private func pauseSong() {
+        isPlaying = false
+        trackInfo.text = ""
         playerImageView.image = #imageLiteral(resourceName: "play_icon")
         state = "Paused"
         audioPlayer.pause()
     }
     
     private func nextSong() {
-        playSong()
+        isPlaying = false
+        audioPlayer.pause()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.playSong()
+        }
+        
     }
     
     private func presentError(_ error: Error?) {
@@ -139,12 +151,13 @@ class HomeViewController: UIViewController {
 extension HomeViewController: PlayerDelegate {
     func playSong(_ presenter: HomePresenter, model: MusicModel) {
         DispatchQueue.main.async {
-            self.isPlaying = !self.isPlaying
-            
+            self.isPlaying = true
+            self.tapped = false
             let urlTrack = model.urlTrack
             
             do {
                 self.state = "Playing"
+                self.trackInfo.text = "\(model.musicArtist) - \(model.musicName)"
                 self.playerImageView.image = #imageLiteral(resourceName: "pause_icon")
                 guard let url = URL(string: urlTrack) else { return }
                 
